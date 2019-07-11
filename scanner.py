@@ -25,7 +25,7 @@ def getEDIPI(data):
 
 
 def drawWindow():
-	win = graphics.GraphWin("CAC Sign in", 800, 480, autoflush=False)
+	win = graphics.GraphWin("CAC Sign in", 800, 480)
 	win.setBackground("white")
 	return win
 
@@ -33,43 +33,54 @@ def drawWindow():
 def clearWindow(win):
 	for item in win.items[:]:
 		item.undraw()
-	win.update()
+	#win.update()
 
 
 def drawIn(name, window):
 	clearWindow(window)
+	print("DRAW IN")
+	window.setBackground("green")
 	time.sleep(.5)
 	s = "Welcome, " + name
 	text = graphics.Text(graphics.Point(400, 240), s)
 	text.setSize(30)
 	text.draw(window)
-
+	time.sleep(1)
+	print("DRAW IN done")
 
 def drawOut(name, window):
+	print("DRAW Out")
 	clearWindow(window)
+	window.setBackground("red")
 	time.sleep(.5)
 	s = "Goodbye, " + name
 	text = graphics.Text(graphics.Point(400, 240), s)
 	text.setSize(30)
 	text.draw(window)
-
+	time.sleep(1)
+	print("DRAW out done")
 
 def drawErr(window):
+	print("DRAW E")
 	clearWindow(window)
 	time.sleep(.5)
+	window.setBackground("yellow")
 	s = "Error, failuire to sign in or out"
 	text = graphics.Text(graphics.Point(400, 240), s)
 	text.setSize(30)
 	text.draw(window)
-
+	time.sleep(1)
+	print("DRAW e done")
 
 def drawDefault(window):
+	print("DRAW nothin")
 	clearWindow(window)
-	time.sleep(.5)
+	time.sleep(1)
 	s = "Scan CAC to sign in or out"
 	text = graphics.Text(graphics.Point(400, 240), s)
 	text.setSize(30)
 	text.draw(window)
+	time.sleep(1)
 
 
 #safeStatus = None
@@ -105,21 +116,23 @@ if __name__ == "__main__":
 	t.start()
 	window = drawWindow()
 	while True:
+	 	oldStatus = safeStatus
 		c.acquire()
 		status = safeStatus
-		c.release()
-		print(status)
-		if status == StatusValues.In:
-			drawIn("connor", window)
-			print("1")
-		elif status == StatusValues.Out:
-			drawOut("connor", window)
-			print("2")
-		elif status == StatusValues.Error:
-			drawErr(window)  
-			print("3")
-		else:
-			drawDefault(window)
+		c.release()	
+		if oldStatus != status:
+			print(status)
+			if status == StatusValues.In:
+				drawIn("connor", window)
+				print("1")
+			elif status == StatusValues.Out:
+				drawOut("connor", window)
+				print("2")
+			elif status == StatusValues.Error:
+				drawErr(window)  
+				print("3")
+			else:
+				drawDefault(window)
 		
 
 
