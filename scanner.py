@@ -63,38 +63,36 @@ def drawDefault(window):
 
 
 safeStatus = None
-def getSafeStatus():
-    return safeStatus
-
-def setSafeStatus(stat):
-    safeStatus = stat
-    print(safeStatus)
+c = threading.Condition()
 
 def logic():
     attendance = MockAttendance()
     barcode_data = ""
     edipi = None
     print("logic loop starting...")	
-    barcode_data = input()
-    edipi = getEDIPI(barcode_data)
-    # Signin API call here, pass in edipi
-    print("EDIPI =", edipi)    
-    status = attendance.checkin_checkout(edipi)
-    print("Sending status...")
-    print(status)
-    setSafeStatus(status)
-    print("status sent...")
-    return
+	while True:
+		barcode_data = input()
+		edipi = getEDIPI(barcode_data)
+		# Signin API call here, pass in edipi
+		print("EDIPI =", edipi)    
+		status = attendance.checkin_checkout(edipi)
+		print("Sending status...")
+		print(status)
+		c.acquire()
+		safeStatus = status
+		c.notify_all()
+		c.release()
+		print("status sent...")
 	
 if __name__ == "__main__":
     print("Graphics thread starting...")
     t = threading.Thread(target=logic)
     t.start()
     window = drawWindow()
-    thread = None
     while True:
-        t.join()
-	status = getSafeStatus()
+        c.acquire()
+	status = safeStatus
+	c.release()
 	print(status)
         if status == StatusValues.In:
            drawIn("connor", window)
@@ -107,6 +105,6 @@ if __name__ == "__main__":
 	    print("3")
 	else:
 	    drawDefault(window)
-	t.start()
+	
 
 
