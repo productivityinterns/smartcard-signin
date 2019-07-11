@@ -20,7 +20,7 @@ def getEDIPI(data):
             # Neither barcode was correct
             # Blink failure light
             # make failure noise
-            print("Neither barcode worked!")
+			print("Error")
     return edipi
 
 
@@ -38,18 +38,14 @@ def clearWindow(win):
 
 def drawIn(name, window):
     clearWindow(window)
-    print("DRAW IN")
     window.setBackground("green")
     #time.sleep(.5)
     s = "Welcome, " + name
     text = graphics.Text(graphics.Point(400, 240), s)
     text.setSize(30)
     text.draw(window)
-    
-    print("DRAW IN done")
 
 def drawOut(name, window):
-    print("DRAW Out")
     clearWindow(window)
     window.setBackground("red")
     #time.sleep(.5)
@@ -58,10 +54,9 @@ def drawOut(name, window):
     text.setSize(30)
     text.draw(window)
     
-    print("DRAW out done")
+
 
 def drawErr(window):
-    print("DRAW E")
     clearWindow(window)
   
     window.setBackground("yellow")
@@ -69,11 +64,8 @@ def drawErr(window):
     text = graphics.Text(graphics.Point(400, 240), s)
     text.setSize(30)
     text.draw(window)
- 
-    print("DRAW e done")
 
 def drawDefault(window):
-    print("DRAW nothin")
     clearWindow(window)   
     s = "Scan CAC to sign in or out"
     text = graphics.Text(graphics.Point(400, 240), s)
@@ -92,22 +84,17 @@ def logic():
     global safeStatus
     global userName
     edipi = None
-    print("logic loop starting...")
     while True:
                 
         barcode_data = sys.stdin.readline() 
         edipi = getEDIPI(barcode_data)        
         # Signin API call here, pass in edipi
-        print("EDIPI =", edipi)
         (status,name) = attendance.checkin_checkout(edipi)
-        print("Sending status...")
-        print(status)
         c.acquire()
         safeStatus = status
         userName = name
         c.notify_all()
         c.release()
-        print("status sent...")
 
 
 if __name__ == "__main__":
@@ -116,7 +103,6 @@ if __name__ == "__main__":
     safeStatus = None
     oldName = None
     userName = ""
-    print("Graphics thread starting...")
     t = threading.Thread(target=logic)
     t.start()
     window = drawWindow()
@@ -127,16 +113,12 @@ if __name__ == "__main__":
         name = userName
         c.release()
         if oldStatus != status or oldName != name:
-            print(status)
             if status == StatusValues.In:
                 drawIn(name, window)
-                print("1")
             elif status == StatusValues.Out:
                 drawOut(name, window)
-                print("2")
             elif status == StatusValues.Error:
                 drawErr(window)  
-                print("3")
             else:
                 drawDefault(window)
         oldStatus = safeStatus
