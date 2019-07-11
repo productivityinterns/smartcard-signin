@@ -28,6 +28,9 @@ class MockAttendance:
         pass
 
     def checkin_checkout(self,identifier):
+        """
+        Returns a random statusvalue, and random name, after 0.5s delay
+        """
         time.sleep(0.500)
-        return random.choice([StatusValues.In,StatusValues.Out,StatusValues.Error])
+        return (random.choice([StatusValues.In,StatusValues.Out,StatusValues.Error]),random.choice(["Bob","Joe","Fred","Julie","Suzie"]))
 
