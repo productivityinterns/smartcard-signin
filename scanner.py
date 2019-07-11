@@ -68,12 +68,34 @@ def getSafeStatus():
 
 def setSafeStatus(stat):
     safeStatus = stat
+    print(safeStatus)
 
-def graphicsHandler():
-    win = drawWindow()
+def logic():
+    attendance = MockAttendance()
+    barcode_data = ""
+    edipi = None
+    print("logic loop starting...")	
+    barcode_data = input()
+    edipi = getEDIPI(barcode_data)
+    # Signin API call here, pass in edipi
+    print("EDIPI =", edipi)    
+    status = attendance.checkin_checkout(edipi)
+    print("Sending status...")
+    print(status)
+    setSafeStatus(status)
+    print("status sent...")
+    return
+	
+if __name__ == "__main__":
+    print("Graphics thread starting...")
+    t = threading.Thread(target=logic)
+    t.start()
+    window = drawWindow()
     thread = None
     while True:
-	getSafeStatus()
+        t.join()
+	status = getSafeStatus()
+	print(status)
         if status == StatusValues.In:
            drawIn("connor", window)
 	   print("1")
@@ -85,22 +107,6 @@ def graphicsHandler():
 	    print("3")
 	else:
 	    drawDefault(window)
+	t.start()
 
-if __name__ == "__main__":
-	attendance = MockAttendance()
-	barcode_data = ""
-	edipi = None
-	threading.Thread(target=graphicsHandler).start()
-	while True:
-	
-	    barcode_data = input()
-	    edipi = getEDIPI(barcode_data)
-	    # Signin API call here, pass in edipi
-	    print("EDIPI =", edipi)
-	    	
-	    status = attendance.checkin_checkout(edipi)
-	    print(status)
-	    setSafeStatus(status)
 
-    	#tag = clf.connect(rdwr={'on-connect': lambda tag: False})
-    	#print(tag)
