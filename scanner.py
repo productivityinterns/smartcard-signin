@@ -1,8 +1,9 @@
-import nfc
 #from nfc.clf import RemoteTarget
 from cacbarcode import PDF417Barcode, Code39Barcode
+from attendance import MockAttendance, StatusValues
 
 def getEDIPI(data):
+    edipi = ""
     try:
         barcode = PDF417Barcode(data)
         edipi = barcode.edipi
@@ -18,6 +19,8 @@ def getEDIPI(data):
             print("Neither barcode worked!")
     return edipi
 #clf = nfc.ContactlessFrontend('usb')
+
+attendance = MockAttendance()
 barcode_data = ""
 edipi = None
 while True:
@@ -25,6 +28,8 @@ while True:
     edipi = getEDIPI(barcode_data)
     # Signin API call here, pass in edipi
     print("EDIPI =", edipi)
-
+	
+    status = attendance.checkin_checkout(edipi)
+    print(status)
     	#tag = clf.connect(rdwr={'on-connect': lambda tag: False})
     	#print(tag)
