@@ -1,5 +1,5 @@
+from __future__ import print_function #Needed to make print a funciton not statement
 __author__ = 'John Kusner'
-
 import datetime
 
 _1_jan_1000 = datetime.datetime(1000, 1, 1)
